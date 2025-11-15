@@ -1,5 +1,5 @@
 {
-   "name": "electron-multi-tool",
+   "name": "Database_Manager",
    "version": "1.0.0",
    "description": "",
    "main": "server/main.js",
@@ -69,7 +69,8 @@
       "react-resizable-panels": "^3.0.6",
       "react-tooltip": "^5.30.0",
       "react18-json-view": "^0.2.9-canary.11",
-      "reactflow": "^11.11.4"
+      "reactflow": "^11.11.4",
+      "redis": "^5.9.0"
    },
    "build": {
       "extraResources": [

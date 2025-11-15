@@ -11,10 +11,8 @@ import {
   getTableStructure,
   getTableData,
 } from './database/queries/index.js'
-import { EJSON } from 'bson'
 import { DbEngine } from './dbEngineController.js'
-import { createDriver } from '../server/db/index.js'
-import { testConnection } from './db/index.js'
+import { createDriver,testConnection } from '../server/database/index.js'
 
 // Recreate __dirname and __filename for ES modules
 const __filename = fileURLToPath(import.meta.url)
