@@ -1,17 +1,17 @@
-import React, { useEffect, useRef } from "react";
-import { useAppContext } from '../context/AppContext';
+import React, { useEffect, useRef } from 'react'
+import { useAppContext } from '../context/AppContext'
 
 export default function LogsPanel() {
-  const {logs}  = useAppContext()
- 
-  const logContainerRef = useRef(null);
+  const { logs } = useAppContext()
+
+  const logContainerRef = useRef(null)
 
   // Auto-scroll to bottom when logs change
   useEffect(() => {
     if (logContainerRef.current) {
-      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight
     }
-  }, [logs]);
+  }, [logs])
 
   return (
     <div
@@ -27,14 +27,14 @@ export default function LogsPanel() {
           <div key={i} className="mb-1">
             <span
               className={
-                log.type === "error"
-                  ? "text-red-400"
-                  : log.type === "success"
-                  ? "text-green-400"
-                  : "text-gray-300"
+                log.type === 'error'
+                  ? 'text-red-400'
+                  : log.type === 'success'
+                    ? 'text-green-400'
+                    : 'text-gray-300'
               }
               dangerouslySetInnerHTML={{
-                __html: `[${log.time}] ${log.message.replace(/\n/g, "<br/>")}`,
+                __html: `[${log.time}] ${log.message.replace(/\n/g, '<br/>')}`,
               }}
             />
           </div>
@@ -43,5 +43,5 @@ export default function LogsPanel() {
         <p className="text-gray-500 italic">No logs yet.</p>
       )}
     </div>
-  );
+  )
 }

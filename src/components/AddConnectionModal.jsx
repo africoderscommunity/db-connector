@@ -1,22 +1,24 @@
-import React from "react";
+import React from 'react'
 import { useDatabase } from '../context/DatabaseContext'
 import { useAppContext } from '../context/AppContext'
 
 export default function AddConnectionModal() {
- const {
-      error, setError,
-      formData, setFormData,
-      addConnection,testingConnection,
-      getDefaultPort,testConnection,
- } = useDatabase()
+  const {
+    error,
+    setError,
+    formData,
+    setFormData,
+    addConnection,
+    testingConnection,
+    getDefaultPort,
+    testConnection,
+  } = useDatabase()
 
+  const { showAddForm, setShowAddForm } = useAppContext()
+  if (!showAddForm) return null
 
-const {
-   showAddForm, setShowAddForm,
-} = useAppContext()
-  if (!showAddForm) return null;
-
-  const isMongo = formData.type === "mongodb";
+  const isMongo = formData.type === 'mongodb'
+  const isRedis = formData.type === 'redis'
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -60,6 +62,7 @@ const {
               <option value="mysql">MySQL</option>
               <option value="postgresql">PostgreSQL</option>
               <option value="mongodb">MongoDB</option>
+              <option value="redis">Redis</option>
               <option value="mssql">SQL Server</option>
             </select>
           </div>
@@ -74,7 +77,7 @@ const {
                 </label>
                 <input
                   type="text"
-                  value={formData.mongoUrlLink || ""}
+                  value={formData.mongoUrlLink || ''}
                   onChange={(e) =>
                     setFormData({ ...formData, mongoUrlLink: e.target.value })
                   }
@@ -83,12 +86,14 @@ const {
                 />
               </div>
             </>
-          ) : (
+          ) : isRedis ? (
             <>
-              {/* Host & Port */}
+              {/* Redis Host & Port */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Host *</label>
+                  <label className="block text-sm font-medium mb-1">
+                    Host *
+                  </label>
                   <input
                     type="text"
                     value={formData.host}
@@ -100,9 +105,77 @@ const {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium mb-1">Port</label>
+                  <input
+                    type="text"
+                    value={formData.port}
+                    onChange={(e) =>
+                      setFormData({ ...formData, port: e.target.value })
+                    }
+                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                    placeholder={getDefaultPort(formData.type)}
+                  />
+                </div>
+              </div>
+
+              {/* Redis Database Index */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Database Index (0-15)
+                </label>
+                <input
+                  type="text"
+                  value={formData.database || '0'}
+                  onChange={(e) =>
+                    setFormData({ ...formData, database: e.target.value })
+                  }
+                  className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                  placeholder="0"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Redis database index (default: 0)
+                </p>
+              </div>
+
+              {/* Redis Password (Optional) */}
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Password (Optional)
+                </label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                  placeholder="••••••••"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Leave empty if no password required
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Host & Port */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <label className="block text-sm font-medium mb-1">
-                    Port
+                    Host *
                   </label>
+                  <input
+                    type="text"
+                    value={formData.host}
+                    onChange={(e) =>
+                      setFormData({ ...formData, host: e.target.value })
+                    }
+                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                    placeholder="localhost"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Port</label>
                   <input
                     type="text"
                     value={formData.port}
@@ -133,7 +206,9 @@ const {
 
               {/* Username */}
               <div>
-                <label className="block text-sm font-medium mb-1">Username</label>
+                <label className="block text-sm font-medium mb-1">
+                  Username
+                </label>
                 <input
                   type="text"
                   value={formData.username}
@@ -147,7 +222,9 @@ const {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-medium mb-1">Password</label>
+                <label className="block text-sm font-medium mb-1">
+                  Password
+                </label>
                 <input
                   type="password"
                   value={formData.password}
@@ -176,7 +253,7 @@ const {
             disabled={testingConnection}
             className="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded font-medium transition disabled:opacity-50"
           >
-            {testingConnection ? "Testing..." : "Test Connection"}
+            {testingConnection ? 'Testing...' : 'Test Connection'}
           </button>
           <button
             onClick={addConnection}
@@ -186,8 +263,8 @@ const {
           </button>
           <button
             onClick={() => {
-              setShowAddForm(false);
-              setError("");
+              setShowAddForm(false)
+              setError('')
             }}
             className="px-4 bg-gray-700 hover:bg-gray-600 py-2 rounded font-medium transition"
           >
@@ -196,5 +273,5 @@ const {
         </div>
       </div>
     </div>
-  );
+  )
 }

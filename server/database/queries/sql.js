@@ -1,4 +1,4 @@
-export const MssqlPrimaryAndUniqueIndexes=`
+export const MssqlPrimaryAndUniqueIndexes = `
 SELECT 
     t.name AS TableName,
     i.name AS IndexName,
@@ -28,4 +28,4 @@ LEFT JOIN sys.columns AS ref_c
     ON ref_c.object_id = fkc.referenced_object_id AND ref_c.column_id = fkc.referenced_column_id
 WHERE i.type_desc <> 'HEAP'
 ORDER BY t.name, i.name, ic.key_ordinal;
-`;
+`

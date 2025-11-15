@@ -1,65 +1,71 @@
-import React, { useEffect, useState } from "react";
-import { Layers, X } from "lucide-react";
+import React, { useEffect, useState } from 'react'
+import { Layers, X } from 'lucide-react'
 
 export default function StructureModal({ tableName, onClose, connection }) {
-  const [columns, setColumns] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [columns, setColumns] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [tableMeta, setTableMeta] = useState({
-    engine: "Unknown",
-    collation: "Unknown",
+    engine: 'Unknown',
+    collation: 'Unknown',
     rows: 0,
-  });
+  })
 
   useEffect(() => {
     const loadStructure = async () => {
       try {
-        setLoading(true);
-        const res = await window.electron.db.getTableStructure({ connection, tableName });
-        console.log("🔍 Table Structure Response:", res);
+        setLoading(true)
+        const res = await window.electron.db.getTableStructure({
+          connection,
+          tableName,
+        })
+        console.log('🔍 Table Structure Response:', res)
 
         if (res.success) {
           // MySQL / Postgres response
-          setColumns(res.columns || []);
+          setColumns(res.columns || [])
           setTableMeta({
-            engine: res.engine || "InnoDB",
-            collation: res.collation || "utf8mb4_unicode_ci",
+            engine: res.engine || 'InnoDB',
+            collation: res.collation || 'utf8mb4_unicode_ci',
             rows: res.rows || 0,
-          });
+          })
         } else if (res.meta) {
           // MSSQL response from our new structure
-          setColumns(res.columns || []);
+          setColumns(res.columns || [])
           setTableMeta({
-            engine: res.meta.Engine || "MSSQL",
-            collation: res.meta.Collation || "Unknown",
+            engine: res.meta.Engine || 'MSSQL',
+            collation: res.meta.Collation || 'Unknown',
             rows: res.meta.Rows || 0,
-          });
+          })
         } else if (Array.isArray(res)) {
           // fallback array-only return
-          setColumns(res);
+          setColumns(res)
         } else {
-          setError(res.message || "Failed to load structure");
+          setError(res.message || 'Failed to load structure')
         }
       } catch (err) {
-        console.error(err);
-        setError("Error fetching structure");
+        console.error(err)
+        setError('Error fetching structure')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    loadStructure();
-  }, [tableName, connection]);
+    }
+    loadStructure()
+  }, [tableName, connection])
 
   const formatDefault = (value) => {
     if (!value || value === null) {
-      return <span className="italic text-gray-500">NULL</span>;
+      return <span className="italic text-gray-500">NULL</span>
     }
     return (
-      <span className="text-gray-300 break-all whitespace-pre-wrap" title={String(value)}>
+      <span
+        className="text-gray-300 break-all whitespace-pre-wrap"
+        title={String(value)}
+      >
         {String(value)}
       </span>
-    );
-  };
+    )
+  }
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
@@ -75,7 +81,10 @@ export default function StructureModal({ tableName, onClose, connection }) {
               View column definitions, foreign keys, and properties
             </p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg transition">
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-700 rounded-lg transition"
+          >
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -87,7 +96,9 @@ export default function StructureModal({ tableName, onClose, connection }) {
               Loading table structure...
             </div>
           ) : error ? (
-            <div className="text-center text-red-400 text-sm py-10">{error}</div>
+            <div className="text-center text-red-400 text-sm py-10">
+              {error}
+            </div>
           ) : (
             <>
               {/* Table */}
@@ -122,10 +133,14 @@ export default function StructureModal({ tableName, onClose, connection }) {
                     {columns.length ? (
                       columns.map((col, i) => (
                         <tr key={i} className="hover:bg-gray-800/50 transition">
-                          <td className="px-4 py-3 text-sm text-white font-medium">{col.name}</td>
-                          <td className="px-4 py-3 text-sm text-blue-400">{col.type}</td>
+                          <td className="px-4 py-3 text-sm text-white font-medium">
+                            {col.name}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-blue-400">
+                            {col.type}
+                          </td>
                           <td className="px-4 py-3 text-sm">
-                            {col.nullable === "YES" || col.nullable === true ? (
+                            {col.nullable === 'YES' || col.nullable === true ? (
                               <span className="text-green-400">YES</span>
                             ) : (
                               <span className="text-red-400">NO</span>
@@ -137,16 +152,20 @@ export default function StructureModal({ tableName, onClose, connection }) {
                                 {col.key}
                               </span>
                             ) : (
-                              "-"
+                              '-'
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm max-w-[300px]">{formatDefault(col.default)}</td>
+                          <td className="px-4 py-3 text-sm max-w-[300px]">
+                            {formatDefault(col.default)}
+                          </td>
                           <td className="px-4 py-3 text-sm text-gray-400 break-all">
-                            {col.extra || "-"}
+                            {col.extra || '-'}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-300 break-all">
                             {col.foreignKey ? (
-                              <span className="text-yellow-400">{col.foreignKey}</span>
+                              <span className="text-yellow-400">
+                                {col.foreignKey}
+                              </span>
                             ) : (
                               <span className="text-gray-500">-</span>
                             )}
@@ -155,7 +174,10 @@ export default function StructureModal({ tableName, onClose, connection }) {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="text-center text-gray-500 text-sm py-6">
+                        <td
+                          colSpan="7"
+                          className="text-center text-gray-500 text-sm py-6"
+                        >
                           No columns found for this table
                         </td>
                       </tr>
@@ -203,5 +225,5 @@ export default function StructureModal({ tableName, onClose, connection }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

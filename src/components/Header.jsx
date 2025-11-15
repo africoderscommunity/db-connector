@@ -1,13 +1,16 @@
-import React, { useState } from "react";
-import { Database, Plus } from "lucide-react";
+import React, { useState } from 'react'
+import { Database, Plus } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
 
-export default function Header({ tabs = ["Connections", "Visual Schema" , "Db Engine"], onTabChange }) {
-  const { setShowAddForm,activeTab, setActiveTab } = useAppContext();
+export default function Header({
+  tabs = ['Connections', 'Visual Schema', 'Db Engine'],
+  onTabChange,
+}) {
+  const { setShowAddForm, activeTab, setActiveTab } = useAppContext()
 
   const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+    setActiveTab(tab)
+  }
 
   return (
     <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
@@ -28,8 +31,8 @@ export default function Header({ tabs = ["Connections", "Visual Schema" , "Db En
                 onClick={() => handleTabClick(tab)}
                 className={`px-4 py-2 rounded-lg transition text-sm font-medium ${
                   activeTab === tab
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >
                 {tab}
@@ -48,5 +51,5 @@ export default function Header({ tabs = ["Connections", "Visual Schema" , "Db En
         </div>
       </div>
     </div>
-  );
+  )
 }

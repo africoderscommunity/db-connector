@@ -1,5 +1,5 @@
-import React from "react";
-import { Database } from "lucide-react";
+import React from 'react'
+import { Database } from 'lucide-react'
 
 export default function EmptyState() {
   return (
@@ -10,5 +10,5 @@ export default function EmptyState() {
         <p className="text-sm mt-2">or click "New Connection" to add one</p>
       </div>
     </div>
-  );
+  )
 }

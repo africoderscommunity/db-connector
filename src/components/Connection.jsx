@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   MoreVertical,
   Edit2,
@@ -6,9 +6,9 @@ import {
   Database,
   ChevronDown,
   ChevronRight,
-} from "lucide-react";
-import { useDatabase } from "../context/DatabaseContext";
-import { useAppContext } from "../context/AppContext";
+} from 'lucide-react'
+import { useDatabase } from '../context/DatabaseContext'
+import { useAppContext } from '../context/AppContext'
 
 export default function Connection() {
   const {
@@ -22,22 +22,24 @@ export default function Connection() {
     activeConnection,
     editConnection,
     deleteConnection,
-  } = useDatabase();
+  } = useDatabase()
 
-  const { connectionStatus } = useAppContext();
+  const { connectionStatus } = useAppContext()
 
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const [expandedConnectionId, setExpandedConnectionId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null)
+  const [expandedConnectionId, setExpandedConnectionId] = useState(null)
 
-  const toggleMenu = (id) => setOpenMenuId(openMenuId === id ? null : id);
-  const closeMenu = () => setOpenMenuId(null);
+  const toggleMenu = (id) => setOpenMenuId(openMenuId === id ? null : id)
+  const closeMenu = () => setOpenMenuId(null)
   const toggleExpand = (id) =>
-    setExpandedConnectionId(expandedConnectionId === id ? null : id);
-  const loadDatabasebTable = (conn,db="") => async () => {
-    setConnectingId(conn.id);
-    setActiveConnection(conn);
-    return await LoadDbTable({connectionId:conn.id,db});
-  };
+    setExpandedConnectionId(expandedConnectionId === id ? null : id)
+  const loadDatabasebTable =
+    (conn, db = '') =>
+    async () => {
+      setConnectingId(conn.id)
+      setActiveConnection(conn)
+      return await LoadDbTable({ connectionId: conn.id, db })
+    }
 
   return (
     <div className="w-64 bg-gray-800 border-r border-gray-700 overflow-y-auto relative">
@@ -52,7 +54,7 @@ export default function Connection() {
           </p>
         ) : (
           connections.map((conn) => {
-            const isExpanded = expandedConnectionId === conn.id;
+            const isExpanded = expandedConnectionId === conn.id
 
             return (
               <div key={conn.id} className="mb-2">
@@ -60,15 +62,16 @@ export default function Connection() {
                 <div
                   className={`p-3 rounded-lg transition relative cursor-pointer ${
                     activeConnection?.id === conn.id
-                      ? "bg-gray-700"
-                      : "bg-gray-700 hover:bg-gray-600"
+                      ? 'bg-gray-700'
+                      : 'bg-gray-700 hover:bg-gray-600'
                   }`}
                   onClick={() => {
-                   if (conn.type !== "mongodb"){ 
-                          connectionStatus?.[conn.id]?.status && loadDatabasebTable(conn)();
-                   }else{
-                    toggleExpand(conn.id)
-                   }
+                    if (conn.type !== 'mongodb') {
+                      connectionStatus?.[conn.id]?.status &&
+                        loadDatabasebTable(conn)()
+                    } else {
+                      toggleExpand(conn.id)
+                    }
                   }}
                 >
                   <div className="flex items-center justify-between">
@@ -93,7 +96,8 @@ export default function Connection() {
                       </div>
 
                       <div className="flex items-center gap-2 font-medium truncate text-sm">
-                        {conn.type === "mongodb" && connectionStatus?.[conn.id]?.databases?.length > 0 && 
+                        {conn.type === 'mongodb' &&
+                          connectionStatus?.[conn.id]?.databases?.length > 0 &&
                           (isExpanded ? (
                             <ChevronDown className="w-4 h-4" />
                           ) : (
@@ -103,16 +107,16 @@ export default function Connection() {
                       </div>
 
                       <div className="text-xs text-gray-400 truncate">
-                        {conn.type.toUpperCase()} •{" "}
-                        {conn.host || conn.mongoUrlLink || ""}
+                        {conn.type.toUpperCase()} •{' '}
+                        {conn.host || conn.mongoUrlLink || ''}
                       </div>
                     </div>
 
                     {/* More Options */}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation();
-                        toggleMenu(conn.id);
+                        e.stopPropagation()
+                        toggleMenu(conn.id)
                       }}
                       className="p-1 hover:bg-gray-600 rounded"
                       title="More options"
@@ -129,20 +133,23 @@ export default function Connection() {
                     >
                       <button
                         onClick={() => {
-                          closeMenu();
-                          const loadTable = conn.type === "mongodb" ? false : true
-                          connectToDatabase(conn,loadTable );
+                          closeMenu()
+                          const loadTable =
+                            conn.type === 'mongodb' ? false : true
+                          connectToDatabase(conn, loadTable)
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-t"
                       >
                         <Database className="w-4 h-4 text-green-400" />
-                        { connectionStatus?.[conn.id]?.status ?"Refresh ": "Connect to DB"}
+                        {connectionStatus?.[conn.id]?.status
+                          ? 'Refresh '
+                          : 'Connect to DB'}
                       </button>
 
                       <button
                         onClick={() => {
-                          closeMenu();
-                          editConnection && editConnection(conn);
+                          closeMenu()
+                          editConnection && editConnection(conn)
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
                       >
@@ -152,9 +159,9 @@ export default function Connection() {
 
                       <button
                         onClick={() => {
-                          closeMenu();
+                          closeMenu()
                           if (confirm(`Delete connection "${conn.name}"?`)) {
-                            deleteConnection(conn.id);
+                            deleteConnection(conn.id)
                           }
                         }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-b"
@@ -167,23 +174,26 @@ export default function Connection() {
                 </div>
 
                 {/* ===== MongoDB Databases List (Outside Gray Box) ===== */}
-                {conn.type === "mongodb" && isExpanded && connectionStatus?.[conn.id]?.databases?.length > 0 && (
-                  <div className="ml-6 mt-1 text-xs text-gray-300 space-y-1 border-l border-gray-700 pl-2">
-                    {connectionStatus?.[conn.id]?.databases?.map((db, i) => (
-                      <div
-                        key={i}
-                        className="cursor-pointer hover:text-white transition"
+                {conn.type === 'mongodb' &&
+                  isExpanded &&
+                  connectionStatus?.[conn.id]?.databases?.length > 0 && (
+                    <div className="ml-6 mt-1 text-xs text-gray-300 space-y-1 border-l border-gray-700 pl-2">
+                      {connectionStatus?.[conn.id]?.databases?.map((db, i) => (
+                        <div
+                          key={i}
+                          className="cursor-pointer hover:text-white transition"
                           onClick={() => {
-                          connectionStatus?.[conn.id]?.status && loadDatabasebTable(conn,db)();
-                  }}
-                      >
-                        • {db}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                            connectionStatus?.[conn.id]?.status &&
+                              loadDatabasebTable(conn, db)()
+                          }}
+                        >
+                          • {db}
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
-            );
+            )
           })
         )}
       </div>
@@ -192,5 +202,5 @@ export default function Connection() {
         <div className="fixed inset-0 z-0" onClick={closeMenu}></div>
       )}
     </div>
-  );
+  )
 }
