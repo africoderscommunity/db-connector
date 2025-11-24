@@ -229,29 +229,68 @@ export class RedisDriver extends BaseDriver {
       executionTime: ((Date.now() - startTime) / 1000).toFixed(3) + 's',
     }
   }
-  async getTables(db, refresh = false) {
-    const redisConn = this.conn
+  async createTable(tableName) {
+    try {
+      const client = this.conn.connection
 
-    if (refresh || !redisConn.keyPatterns) {
-      const patterns = new Set()
-      let count = 0
+      // In Redis, we create a "table" by creating an initial key with the pattern
+      // For example: tableName:_meta will store metadata about this pattern
+      const metaKey = `${tableName}:_meta`
 
-      for await (const key of redisConn.connection.scanIterator({
-        MATCH: '*',
-        COUNT: 100,
+      // Check if pattern already exists
+      const existingKeys = []
+      for await (const key of client.scanIterator({
+        MATCH: `${tableName}:*`,
+        COUNT: 10,
       })) {
-        if (count >= 1000) break
-        const pattern = key.includes(':') ? key.split(':')[0] : '__keys__'
-        patterns.add(pattern)
-        count++
+        existingKeys.push(key)
+        if (existingKeys.length >= 1) break
       }
 
-      const tables = Array.from(patterns).sort()
-      redisConn.keyPatterns = tables
-      return tables.length > 0 ? tables : ['(no keys found)']
+      if (existingKeys.length > 0) {
+        throw new Error(`Pattern '${tableName}' already exists with ${existingKeys.length} key(s)`)
+      }
+
+      // Create a metadata key to establish the pattern
+      await client.set(
+        metaKey,
+        JSON.stringify({
+          created: new Date().toISOString(),
+          pattern: tableName,
+          description: `Key pattern for ${tableName}`,
+        })
+      )
+
+      return {
+        success: true,
+        message: `Pattern '${tableName}' created successfully. Use '${tableName}:key_name' to add keys to this pattern.`,
+      }
+    } catch (error) {
+      console.error('Redis createTable error:', error)
+      return {
+        success: false,
+        message: error.message || 'Failed to create pattern',
+      }
+    }
+  }
+  async getTables(db) {
+    console.log({ connection: this.conn })
+    const patterns = new Set()
+    let count = 0
+
+    for await (const key of this.conn.connection.scanIterator({
+      MATCH: '*',
+      COUNT: 100,
+    })) {
+      if (count >= 1000) break
+      const pattern = key.includes(':') ? key.split(':')[0] :null
+
+      pattern && patterns.add(pattern)
+      count++
     }
 
-    return redisConn.keyPatterns
+    const tables = Array.from(patterns).sort()
+    return tables.length > 0 ? tables : []
   }
   async getTableData(pattern, limit = 100, offset = 0) {
     const client = this.conn.connection

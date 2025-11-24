@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDatabase } from '../context/DatabaseContext'
 import ReactJson from 'react18-json-view'
+import { isStructured, formatSqlValue,formatValue, normalizeMongoValue} from '../utils/formatters'
 
 export default function DataTable() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -33,53 +34,53 @@ export default function DataTable() {
   }
 
   // --- helpers ---
-  const isStructured = (val) => {
-    if (val instanceof Date) return false
-    if (val === null || val === undefined) return false
-    // if (val.$oid  ) return false;
-    if (typeof val === 'object') return true
+  // const isStructured = (val) => {
+  //   if (val instanceof Date) return false
+  //   if (val === null || val === undefined) return false
+  //   // if (val.$oid  ) return false;
+  //   if (typeof val === 'object') return true
 
-    if (typeof val === 'string') {
-      try {
-        const parsed = JSON.parse(val)
-        return typeof parsed === 'object'
-      } catch {
-        return false
-      }
-    }
-    return false
-  }
+  //   if (typeof val === 'string') {
+  //     try {
+  //       const parsed = JSON.parse(val)
+  //       return typeof parsed === 'object'
+  //     } catch {
+  //       return false
+  //     }
+  //   }
+  //   return false
+  // }
 
-  const formatValue = (val) => {
-    if (val === null || val === undefined) return 'NULL'
-    if (val === '') return 'empty'
-    if (val instanceof Date) return val.toISOString()
-    if (typeof val === 'object' && val !== null) {
-      if (val.$oid) {
-        // return `ObjectId("${val.$oid}")`;}
+  // const formatValue = (val) => {
+  //   if (val === null || val === undefined) return 'NULL'
+  //   if (val === '') return 'empty'
+  //   if (val instanceof Date) return val.toISOString()
+  //   if (typeof val === 'object' && val !== null) {
+  //     if (val.$oid) {
+  //       // return `ObjectId("${val.$oid}")`;}
 
-        return val.$oid
-      }
-      if (val.$date) {
-        try {
-          return new Date(val.$date).toISOString()
-        } catch {
-          return String(val.$date)
-        }
-      }
-      if (Array.isArray(val)) return `[Array(${val.length})]`
-      return '{Object}'
-    }
-    if (typeof val === 'string') {
-      try {
-        const parsed = JSON.parse(val)
-        return formatValue(parsed)
-      } catch {
-        return val
-      }
-    }
-    return String(val)
-  }
+  //       return val.$oid
+  //     }
+  //     if (val.$date) {
+  //       try {
+  //         return new Date(val.$date).toISOString()
+  //       } catch {
+  //         return String(val.$date)
+  //       }
+  //     }
+  //     if (Array.isArray(val)) return `[Array(${val.length})]`
+  //     return '{Object}'
+  //   }
+  //   if (typeof val === 'string') {
+  //     try {
+  //       const parsed = JSON.parse(val)
+  //       return formatValue(parsed)
+  //     } catch {
+  //       return val
+  //     }
+  //   }
+  //   return String(val)
+  // }
 
   // --- editing logic ---
   const handleMenuToggle = (i) => {
@@ -132,34 +133,34 @@ export default function DataTable() {
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(modalContent)
   }
-  const formatSqlValue = (val) => {
-    if (val === null || val === undefined) return 'NULL'
-    if (val instanceof Date)
-      return `'${val.toISOString().slice(0, 19).replace('T', ' ')}'`
-    if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`
-    return `'${JSON.stringify(val).replace(/'/g, "''")}'`
-  }
+  // const formatSqlValue = (val) => {
+  //   if (val === null || val === undefined) return 'NULL'
+  //   if (val instanceof Date)
+  //     return `'${val.toISOString().slice(0, 19).replace('T', ' ')}'`
+  //   if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`
+  //   return `'${JSON.stringify(val).replace(/'/g, "''")}'`
+  // }
 
-  function normalizeMongoValue(value) {
-    // Handle MongoDB extended JSON formats
-    if (value && typeof value === 'object') {
-      if (value.$oid) {
-        // ObjectId representation
-        return `ObjectId('${value.$oid}')`
-      }
-      if (value.$date) {
-        // Handle MongoDB date object
-        const dateVal =
-          typeof value.$date === 'object' && value.$date.$numberLong
-            ? new Date(Number(value.$date.$numberLong)).toISOString()
-            : new Date(value.$date).toISOString()
-        return `ISODate('${dateVal}')`
-      }
-    }
+  // function normalizeMongoValue(value) {
+  //   // Handle MongoDB extended JSON formats
+  //   if (value && typeof value === 'object') {
+  //     if (value.$oid) {
+  //       // ObjectId representation
+  //       return `ObjectId('${value.$oid}')`
+  //     }
+  //     if (value.$date) {
+  //       // Handle MongoDB date object
+  //       const dateVal =
+  //         typeof value.$date === 'object' && value.$date.$numberLong
+  //           ? new Date(Number(value.$date.$numberLong)).toISOString()
+  //           : new Date(value.$date).toISOString()
+  //       return `ISODate('${dateVal}')`
+  //     }
+  //   }
 
-    // Return primitive values or unmodified objects
-    return value
-  }
+  //   // Return primitive values or unmodified objects
+  //   return value
+  // }
 
   const handleUpdate = (rowIndex) => {
     const row = ValidTableData.rows[rowIndex]
@@ -320,24 +321,24 @@ export default function DataTable() {
   }
 
   // --- keyboard shortcuts ---
-  // useEffect(() => {
-  //   const handleKeyDown = (e) => {
-  //     if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-  //       e.preventDefault();
-  //       Object.keys(changedCells).length
-  //         ? handleUpdateAll()
-  //         : alert("No changes detected to save!");
-  //     }
-  //     if ((e.ctrlKey || e.metaKey) && e.key === "r") {
-  //       e.preventDefault();
-  //       Object.keys(changedCells).length
-  //         ? setDiscardModalOpen(true)
-  //         : alert("No changes to discard!");
-  //     }
-  //   };
-  //   document.addEventListener("keydown", handleKeyDown);
-  //   return () => document.removeEventListener("keydown", handleKeyDown);
-  // }, [changedCells]);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        Object.keys(changedCells).length
+          ? handleUpdateAll()
+          : alert("No changes detected to save!");
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "r") {
+        e.preventDefault();
+        Object.keys(changedCells).length
+          ? setDiscardModalOpen(true)
+          : alert("No changes to discard!");
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [changedCells]);
 
   // --- render ---
   return (

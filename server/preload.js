@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electron', {
     testConnection: (config) =>
       ipcRenderer.invoke('db:test-connection', config),
     connect: (config) => ipcRenderer.invoke('db:connect', config),
+    createTable: (config) => ipcRenderer.invoke('db:create-table', config),
     getTables: (config) => ipcRenderer.invoke('db:get-tables', config),
     getTableData: (params) => ipcRenderer.invoke('db:get-table-data', params),
     executeQuery: (params) => ipcRenderer.invoke('db:execute-query', params),

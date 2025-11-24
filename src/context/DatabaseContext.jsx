@@ -153,6 +153,43 @@ export const DatabaseProvider = ({ children }) => {
     }
   }
 
+
+  const createTable = async (tableName) => {
+    try {
+      setLoading(true)
+      setError('')
+
+      const result = await window.electron.db.createTable({
+        connection: activeConnection,
+        tableName,
+      })
+
+      if (result.success) {
+        addLog(`✅ Table '${tableName}' created successfully`, 'success')
+
+        // Refresh tables list
+        await LoadDbTable({
+          connectionId: activeConnection.id,
+          refresh: true,
+        })
+
+        return result
+      } else {
+        const errorMsg = result.message || 'Failed to create table'
+        setError(errorMsg)
+        addLog(`❌ ${errorMsg}`, 'error')
+        throw new Error(errorMsg)
+      }
+    } catch (err) {
+      const errorMsg = err.message || 'Error creating table'
+      setError(errorMsg)
+      addLog(`❌ ${errorMsg}`, 'error')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <DatabaseContext.Provider
       value={{
@@ -201,6 +238,7 @@ export const DatabaseProvider = ({ children }) => {
         executeQuery,
         schemaMetadata,
         setSchemaMetadata,
+        createTable,
       }}
     >
       {children}

@@ -11,7 +11,7 @@ import {
   getTableStructure,
   getTableData,
 } from './database/queries/index.js'
-import { DbEngine } from './dbEngineController.js'
+import { DbEngine } from './database/dbngin/dbEngineController.js'
 import { createDriver,testConnection } from '../server/database/index.js'
 
 // Recreate __dirname and __filename for ES modules
@@ -57,7 +57,11 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
+app.on('before-quit', async (event) => {
+  event.preventDefault();
+  await DbEngine.cleanup();
+  app.exit(0);
+});
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
@@ -208,6 +212,25 @@ ipcMain.handle(
 ipcMain.handle('db:disconnect', async (event, connectionId) => {
   return await dbDisconnect(activeConnections, connectionId)
 })
+
+ipcMain.handle('db:create-table', async (event, config) => {
+  console.log({config,activeConnections})
+   const conn = activeConnections.get(config.connection.id)
+      if (!conn) throw new Error('Please connect your database')
+
+      const driver = createDriver(conn, activeConnections)
+      console.log({
+        driver
+      })
+      const tableName = await driver.createTable(config.tableName)
+      return 
+
+  // return await dbDisconnect(activeConnections, connectionId)
+})
+
+
+
+
 ipcMain.handle(
   'db:export-table',
   async (event, { connection, tableName, format }) => {

@@ -15,6 +15,7 @@ import {
 import { useDatabase } from '../../context/DatabaseContext'
 import { useAppContext } from '../../context/AppContext'
 import StructureModal from './StructureModal'
+import CreateTableModal from './CreateTableModal'
 
 export default function ActiveConnectionData() {
   const {
@@ -24,6 +25,7 @@ export default function ActiveConnectionData() {
     activeConnection,
     loadTableData,
     selectedTable,
+    createTable,
   } = useDatabase()
   const { connectionStatus } = useAppContext()
   const [contextMenu, setContextMenu] = useState(null)
@@ -78,6 +80,16 @@ export default function ActiveConnectionData() {
   const handleCreateTable = () => {
     setShowMenu(false)
     setShowCreateModal(true)
+  }
+
+  const handleConfirmCreateTable = async (tableName) => {
+    try {
+      await createTable(tableName)
+      setShowCreateModal(false)
+    } catch (error) {
+      // Error already handled in createTable function
+      console.error('Create table error:', error)
+    }
   }
 
   const closeContextMenu = () => {
@@ -359,6 +371,14 @@ export default function ActiveConnectionData() {
             table={exportTable}
             onClose={() => setShowExportModal(false)}
             onExport={handleExport}
+          />
+        )}
+
+        {/* ✅ Create Table Modal */}
+        {showCreateModal && (
+          <CreateTableModal
+            onClose={() => setShowCreateModal(false)}
+            onConfirm={handleConfirmCreateTable}
           />
         )}
       </>
