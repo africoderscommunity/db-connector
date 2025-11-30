@@ -19,46 +19,44 @@ contextBridge.exposeInMainWorld('electron', {
     exportTable: (params) => ipcRenderer.invoke('db:export-table', params),
     getColumns: (params) => ipcRenderer.invoke('db:get-columns', params),
   },
-  dbEngine: {
-    listBinaries: () => ipcRenderer.invoke('list-binaries'),
+    dbEngine: {
+      listBinaries: () => ipcRenderer.invoke('list-binaries'),
 
-    // List all instances
-    listInstances: () => ipcRenderer.invoke('list-instances'),
+      // List all instances
+      listInstances: () => ipcRenderer.invoke('list-instances'),
 
-    // Create new instance
-    createInstance: (engine, port, version) =>
-      ipcRenderer.invoke('create-instance', engine, port, version),
+      // Create new instance
+      createInstance: (engine, port, version) =>
+        ipcRenderer.invoke('create-instance', engine, port, version),
 
-    // Start instance
-    startInstance: async (id) => {
-      await ipcRenderer.invoke('start-instance', id)
-      return ipcRenderer.invoke('list-instances') // Return updated list
+      // Start instance
+      startInstance: async (id) => {
+        await ipcRenderer.invoke('start-instance', id)
+        return ipcRenderer.invoke('list-instances') // Return updated list
+      },
+
+      // Stop instance
+      stopInstance: async (id) => {
+        await ipcRenderer.invoke('stop-instance', id)
+        return ipcRenderer.invoke('list-instances') // Return updated list
+      },
+
+      // Delete instance
+      deleteInstance: async (id) => {
+        await ipcRenderer.invoke('delete-instance', id)
+        return ipcRenderer.invoke('list-instances') // Return updated list
+      },
+
+      // Get connection info
+      getConnectionInfo: (id) => ipcRenderer.invoke('get-connection-info', id),
+
+      // Get instance logs
+      getInstanceLogs: (id) => ipcRenderer.invoke('get-instance-logs', id),
     },
-
-    // Stop instance
-    stopInstance: async (id) => {
-      await ipcRenderer.invoke('stop-instance', id)
-      return ipcRenderer.invoke('list-instances') // Return updated list
-    },
-
-    // Delete instance
-    deleteInstance: async (id) => {
-      await ipcRenderer.invoke('delete-instance', id)
-      return ipcRenderer.invoke('list-instances') // Return updated list
-    },
-
-    // Get connection info
-    getConnectionInfo: (id) => ipcRenderer.invoke('get-connection-info', id),
-
-    // Get instance logs
-    getInstanceLogs: (id) => ipcRenderer.invoke('get-instance-logs', id),
-  },
-  // ✅ Event listener for successful DB connection
   onDbConnected: (callback) => {
     ipcRenderer.on('db:connected', (_, payload) => callback(payload))
   },
 
-  // ✅ Optional: remove listener to prevent duplicate events
   removeDbConnectedListener: () => {
     ipcRenderer.removeAllListeners('db:connected')
   },

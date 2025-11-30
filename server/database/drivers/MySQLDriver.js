@@ -86,4 +86,43 @@ export class MySQLDriver extends BaseDriver {
       PrimaryUnique,
     }
   }
+
+  async dbDisconnect(conn){
+     await conn.connection.end()
+  }
+
+  async  deleteTable(connection, tableName) {
+  
+
+ try {
+  
+        const [rows] = await connection.pool.query(
+          `DROP TABLE IF EXISTS \`${tableName}\`;`
+        )
+        return {
+          success: true,
+          message: `Table '${tableName}' deleted successfully.`,
+        }
+ } catch (error) {
+  console.error('Error deleting table:', error)
+    return { success: false, message: error.message }
+ 
+ }
+      }
+     async  getTableStructure(conn, tableName) {
+const [rows] = await conn.connection.query(
+        `SHOW FULL COLUMNS FROM \`${tableName}\``
+      )
+     const  columns = rows.map((col) => ({
+        name: col.Field,
+        type: col.Type,
+        nullable: col.Null === 'YES',
+        key: col.Key,
+        default: col.Default,
+        extra: col.Extra,
+      }))
+      return {
+        columns
+      }
+  }
 }

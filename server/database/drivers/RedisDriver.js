@@ -362,4 +362,12 @@ export class RedisDriver extends BaseDriver {
       connection,
     }
   }
+
+  async dbDisconnect(conn){
+     if (conn.connection.quit) {
+            await conn.connection.quit(); 
+          } else if (conn.connection.disconnect) {
+            conn.connection.disconnect();   
+          }
+  }
 }

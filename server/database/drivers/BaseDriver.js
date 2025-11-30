@@ -23,6 +23,14 @@ export class BaseDriver {
     throw new Error('getTableData() not implemented')
   }
   async connect(config) {
-    throw new Error('getTableData() not implemented')
+    throw new Error('connect() not implemented')
   }
+   async dbDisconnect(conn){
+       throw new Error('dbDisconnect() not implemented')
+
+  }
+           async  getTableStructure(conn, tableName) {
+      throw new Error(`getTableStructure() not implemented`)
+
+           }
 }
